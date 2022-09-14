@@ -8,7 +8,7 @@
 // ------------------------------------- //
 
 #define Queue:%0<%1,%2> \
-        Queue@%0[%1], Queue@idx_%0[%2] = {-1, ...}, Queue@front_%0 = -1, Queue@back_%0 = -1, Queue@count_%0[2]
+        Queue@%0[%1], Queue@idx_%0[%2 + 1] = {-1, ...}, Queue@front_%0 = -1, Queue@back_%0 = -1, Queue@count_%0[2]
 
 /*
     e.g: 
