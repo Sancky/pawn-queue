@@ -1,3 +1,5 @@
+#include <queue>
+
 _@Queue_Foreach_Test_() {
 	print("\n\n\n ---- Test started ---- \n\n\n");
 
