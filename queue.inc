@@ -163,14 +163,17 @@ stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, s
 /*	Returns the value removed.										*/
 /* ---------------------------------------------------------------- */
 
-#define Queue_Clear(%0) \
-		_Queue_Clear(Queue@idx_%0, sizeof Queue@idx_%0, Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
+#if defined MemSet || defined memset
+	#define Queue_Clear(%0) \
+			_Queue_Clear(Queue@idx_%0, sizeof Queue@idx_%0, Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
 
-#if defined MemSet || defined memset 
 	stock _Queue_Clear(const indexes[], size_indexes, &count, &front, &back) 
-#else 
-	stock _Queue_Clear(indexes[], size_indexes, &count, &front, &back)
-#endif 
+#else
+	#define Queue_Clear(%0) \
+			_Queue_Clear(Queue@%0, Queue@idx_%0, sizeof Queue@%0, Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
+
+	stock _Queue_Clear(const queue[], indexes[], size_queue, &count, &front, &back) 
+#endif
 {
 	if(count) { 
 		#if defined MemSet
@@ -178,12 +181,11 @@ stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, s
 		#elseif defined memset 
 			memset(indexes, -1, size_indexes);
 		#else 
-			for(new i = 0; i < size_indexes && count; ++i) {
-				if(indexes[i] == -1)
-					continue;
-
-				indexes[i] = -1;
-				count--;
+			for(new idx = front;; idx = (idx + 1) % size_queue) {
+				indexes[queue[idx]] = -1;
+				
+				if(idx == back)
+					break;
 			}
 		#endif
  
