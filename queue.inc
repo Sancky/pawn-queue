@@ -104,9 +104,9 @@
 #define Queue_InsertValue(%0,%1) \
         _Queue_InsertValue(Queue@%0, Queue@idx_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], sizeof Queue@%0, sizeof Queue@idx_%0, %1)
 
-stock _Queue_InsertValue(queue[], indexes[], &front, &back, &count, size_queue, size_indexes, value) {
+stock bool:_Queue_InsertValue(queue[], indexes[], &front, &back, &count, size_queue, size_indexes, value) {
     if(count == size_queue || (value < 0 || value >= size_indexes) || indexes[value] != -1)
-        return 0;
+        return false;
 
     if(front == -1) 
         front = 0;
@@ -116,7 +116,7 @@ stock _Queue_InsertValue(queue[], indexes[], &front, &back, &count, size_queue, 
     indexes[value] = back;
 
     count ++;
-    return 1;
+    return true;
 }
 
 /* ---------------------------------------------------------------- */
@@ -125,10 +125,54 @@ stock _Queue_InsertValue(queue[], indexes[], &front, &back, &count, size_queue, 
 /*  Insert an value in queue.                                       */
 /*                                                                  */
 /*                                                                  */
-/*  Returns 0 if the queue is full, if the value is lower than 0    */
-/*  or higher than the maximum allowed value, if the value exists   */
-/*  already in queue.                                               */
-/*  Returns 1 for success.                                          */
+/*  Returns false if the queue is full, if the value is lower       */
+/*  than 0 or higher than the maximum allowed value, if the value   */
+/*  exists already in queue.                                        */
+/*  Returns true for success.                                       */
+/* ---------------------------------------------------------------- */
+
+#define Queue_RemoveValue(%0,%1) \
+        _Queue_RemoveValue(Queue@%0, Queue@idx_%0, sizeof Queue@%0, sizeof Queue@idx_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], %1) 
+
+stock bool:_Queue_RemoveValue(queue[], indexes[], size_queue, size_indexes, &front, &back, &count, value) {
+    if(!count || (value < 0 || value >= size_indexes) || indexes[value] == -1) 
+        return false;
+
+    if(front == back)
+        front = back = -1;
+
+    else if(front == indexes[value]) 
+        front = (front + 1) % size_queue;
+    
+    else if(back == indexes[value]) 
+        back = (back - 1) % size_queue;
+
+    else {
+        for(new i = indexes[value]; i != back; i = (i + 1) % size_queue) {
+            queue[i] = queue[(i + 1) % size_queue];
+            indexes[queue[i]] = i;
+        }   
+
+        back = (back - 1) % size_queue;   
+    }
+
+    indexes[value] = -1;
+    
+    count --;
+
+    return true;
+}
+
+/* ---------------------------------------------------------------- */
+/*  Queue_RemoveValue(queue, value)                                 */
+/*                                                                  */
+/*  Remove an element from the queue.                               */
+/*                                                                  */
+/*                                                                  */
+/*  Returns false if the queue is empty, if the value is lower      */
+/*  than 0 or higher than the maximum allowed value, if the value   */
+/*  doesn't exist in queue.                                         */
+/*  Returns true for success.                                       */
 /* ---------------------------------------------------------------- */
 
 #define Queue_RemoveFrontValue(%0) \
@@ -159,20 +203,19 @@ stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, s
 /*  Remove the front (first) value from the queue.                  */
 /*                                                                  */
 /*                                                                  */
-/*  Returns -1 if the queue is empty.                               */
-/*  Returns the value removed.                                      */
+/*  Returns -1 if the queue is empty, otherwise the removed value.  */
 /* ---------------------------------------------------------------- */
 
 #if defined MemSet || defined memset
     #define Queue_Clear(%0) \
             _Queue_Clear(Queue@idx_%0, sizeof Queue@idx_%0, Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
 
-    stock _Queue_Clear(const indexes[], size_indexes, &count, &front, &back) 
+    stock bool:_Queue_Clear(const indexes[], size_indexes, &count, &front, &back) 
 #else
     #define Queue_Clear(%0) \
             _Queue_Clear(Queue@%0, Queue@idx_%0, sizeof Queue@%0, Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
 
-    stock _Queue_Clear(const queue[], indexes[], size_queue, &count, &front, &back) 
+    stock bool:_Queue_Clear(const queue[], indexes[], size_queue, &count, &front, &back) 
 #endif
 {
     if(count) { 
@@ -191,9 +234,9 @@ stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, s
  
         count = 0;
         front = back = -1; 
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
 /* ---------------------------------------------------------------- */
@@ -202,8 +245,8 @@ stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, s
 /*  Clear the queue.                                                */
 /*                                                                  */
 /*                                                                  */
-/*  Returns 1 if the queue is cleared, otherwise 0 (if the queue    */
-/*  is empty).                                                      */
+/*  Returns true if the queue is cleared, otherwise false (if the   */
+/*  queue is empty already).                                        */
 /* ---------------------------------------------------------------- */
 
 #define Queue_GetValuePos(%0,%1) \
@@ -238,7 +281,4 @@ stock bool:_Queue_Contains(const indexes[], size_indexes, count, value)
 /*                                                                  */
 /*  Returns an boolean value (true if value exists, otherwise false */
 /*  ).                                                              */
-/*  Returns -1 if the queue is empty, if the value is lower         */
-/*  than 0 or higher than the maximum value allowed, if the value   */
-/*  doesn't exists in the queue.                                    */
 /* ---------------------------------------------------------------- */
