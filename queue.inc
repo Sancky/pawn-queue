@@ -51,7 +51,7 @@
 /*  Check if the queue is full.                                     */
 /*                                                                  */
 /*                                                                  */
-/*  Returns an boolean value.                                       */
+/*  Returns true if the queue is full, otherwise false.             */
 /* ---------------------------------------------------------------- */
 
 #define Queue_IsEmpty(%0) \
@@ -63,7 +63,7 @@
 /*  Check if the queue is empty.                                    */
 /*                                                                  */
 /*                                                                  */
-/*  Returns an boolean value.                                       */
+/*  Returns true if the queue is empty, otherwise false.            */
 /* ---------------------------------------------------------------- */
 
 #define Queue_Count(%0) \
@@ -84,8 +84,7 @@
 /*  Get the back (last) value from the queue.                       */
 /*                                                                  */
 /*                                                                  */
-/*  Return the back (last) value from the queue.                    */
-/*  Returns -1 if it doesn't exist.                                 */
+/*  Returns the back (last) value from the queue, otherwise -1.     */
 /* ---------------------------------------------------------------- */
 
 #define Queue_GetFrontValue(%0) \
@@ -97,8 +96,7 @@
 /*  Get the front (first) value from the queue.                     */
 /*                                                                  */
 /*                                                                  */
-/*  Return the front (first) value from the queue.                  */
-/*  Returns -1 if it doesn't exist.                                 */
+/*  Returns the front (first) value from the queue, otherwise -1.   */
 /* ---------------------------------------------------------------- */
 
 #define Queue_InsertValue(%0,%1) \
@@ -125,10 +123,7 @@ stock bool:_Queue_InsertValue(queue[], indexes[], &front, &back, &count, size_qu
 /*  Insert an value in queue.                                       */
 /*                                                                  */
 /*                                                                  */
-/*  Returns false if the queue is full, if the value is lower       */
-/*  than 0 or higher than the maximum allowed value, if the value   */
-/*  exists already in queue.                                        */
-/*  Returns true for success.                                       */
+/*  Returns true for success, otherwise false.                      */
 /* ---------------------------------------------------------------- */
 
 #define Queue_RemoveValue(%0,%1) \
@@ -169,10 +164,7 @@ stock bool:_Queue_RemoveValue(queue[], indexes[], size_queue, size_indexes, &fro
 /*  Remove an element from the queue.                               */
 /*                                                                  */
 /*                                                                  */
-/*  Returns false if the queue is empty, if the value is lower      */
-/*  than 0 or higher than the maximum allowed value, if the value   */
-/*  doesn't exist in queue.                                         */
-/*  Returns true for success.                                       */
+/*  Returns true for success, otherwise false.                      */
 /* ---------------------------------------------------------------- */
 
 #define Queue_RemoveFrontValue(%0) \
@@ -203,7 +195,7 @@ stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, s
 /*  Remove the front (first) value from the queue.                  */
 /*                                                                  */
 /*                                                                  */
-/*  Returns -1 if the queue is empty, otherwise the removed value.  */
+/*  Returns the removed value, otherwise -1 if function failed.     */
 /* ---------------------------------------------------------------- */
 
 #if defined MemSet || defined memset
@@ -245,8 +237,7 @@ stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, s
 /*  Clear the queue.                                                */
 /*                                                                  */
 /*                                                                  */
-/*  Returns true if the queue is cleared, otherwise false (if the   */
-/*  queue is empty already).                                        */
+/*  Returns true for success, otherwise false.                      */
 /* ---------------------------------------------------------------- */
 
 #define Queue_GetValuePos(%0,%1) \
@@ -261,10 +252,7 @@ stock _Queue_GetValuePos(const indexes[], size_indexes, front, count, value)
 /*  Get the position of an element from the queue.                  */
 /*                                                                  */
 /*                                                                  */
-/*  Returns the position of the element.                            */
-/*  Returns -1 if the queue is empty, if the value is lower than 0  */
-/*  or higher than the maximum value allowed, if the value doesn't  */
-/*  exists in the queue.                                            */
+/*  Returns the position of the element, otherwise -1.              */
 /* ---------------------------------------------------------------- */
 
 #define Queue_Contains(%0,%1) \
@@ -279,6 +267,5 @@ stock bool:_Queue_Contains(const indexes[], size_indexes, count, value)
 /*  Check if an value exists in the queue.                          */
 /*                                                                  */
 /*                                                                  */
-/*  Returns an boolean value (true if value exists, otherwise false */
-/*  ).                                                              */
+/*  Returns true if value exists, otherwise false.                  */
 /* ---------------------------------------------------------------- */
