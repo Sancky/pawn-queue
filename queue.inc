@@ -241,10 +241,20 @@ stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, s
 /* ---------------------------------------------------------------- */
 
 #define Queue_GetValuePos(%0,%1) \
-        _Queue_GetValuePos(Queue@idx_%0, sizeof Queue@idx_%0, Queue@front_%0, Queue@count_%0[0], %1)
+        _Queue_GetValuePos(Queue@idx_%0, sizeof Queue@idx_%0, sizeof Queue@%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], %1)
 
-stock _Queue_GetValuePos(const indexes[], size_indexes, front, count, value) 
-    return (count && (value >= 0 && value < size_indexes) && indexes[value] != -1) ? indexes[value] - front + 1 : -1;
+stock _Queue_GetValuePos(const indexes[], size_indexes, size_queue, front, back, count, value) {
+    if(!count || (value < 0 || value >= size_indexes) || indexes[value] == -1)
+        return -1;
+
+    if(indexes[value] >= front) 
+        return indexes[value] - front + 1;
+
+    if(back < front && indexes[value] <= back)
+        return size_queue + indexes[value] - front + 1;
+
+    return -1;
+}
 
 /* ---------------------------------------------------------------- */
 /*  Queue_GetValuePos(queue, value)                                 */
