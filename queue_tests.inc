@@ -1,134 +1,171 @@
 #include <queue>
 
-_@Queue_Foreach_Test_() {
-	print("\n\n\n ---- Test started ---- \n\n\n");
+// ------------------------------------- //
+//              Utils                    //
+// ------------------------------------- //
 
-	new 
-		Queue:queueTest<10, 5000>;
+#define _@Queue_Print_Values(%0,%1) \
+        Queue_Foreach(new i : <%0>) format(%1, sizeof %1, "%s %d", %1, i); print(%1)
 
-	Queue_InsertValue(queueTest, -500000); //error
-	Queue_InsertValue(queueTest, (sizeof Queue@queueTest) + 500000); //error
-	Queue_InsertValue(queueTest, -1); //error
+// ------------------------------------- //
+//              Tests                    //
+// ------------------------------------- //
 
-	Queue_InsertValue(queueTest, 65); //removed
-	Queue_InsertValue(queueTest, 70); //removed
-	Queue_InsertValue(queueTest, 85); //removed
-	Queue_InsertValue(queueTest, 90); //removed
-	Queue_InsertValue(queueTest, 100);
-	Queue_InsertValue(queueTest, 223);
+_@Queue_Test_Foreach() {
+    new 
+        Queue:queue<10, 1000>;
 
-	Queue_RemoveFrontValue(queueTest); //65
-	Queue_RemoveFrontValue(queueTest); //70
-	Queue_RemoveFrontValue(queueTest); //85
+    //Loop through an empty queue.
+    Queue_Foreach(new i : <queue>) {
+        #pragma unused i
+    }
 
-	Queue_InsertValue(queueTest, 54);
-	Queue_InsertValue(queueTest, 69);
-	Queue_InsertValue(queueTest, 79);
-	Queue_InsertValue(queueTest, 27);
-	Queue_InsertValue(queueTest, 47);
-	Queue_InsertValue(queueTest, 65);
-	Queue_InsertValue(queueTest, 85);
-	Queue_RemoveFrontValue(queueTest); //90
-	Queue_InsertValue(queueTest, 0);
-	Queue_InsertValue(queueTest, 150); //full queue, not added
+    //Insert some values
+    Queue_InsertValue(queue, 3);
+    Queue_InsertValue(queue, 2);
+    Queue_InsertValue(queue, 5);
+    Queue_InsertValue(queue, 1);
+    Queue_InsertValue(queue, 6);
 
-	new 
-		string[256] = "Queue Elements: ";
+    //Check if the values are the correct ones.
+    new 
+        values[10] = {3, 2, 5, 1, 6}, values_count;
 
-	Queue_Foreach(new i : <queueTest>) {
-		format(string, sizeof string, Queue_GetBackValue(queueTest) == i ? "%s%d." : "%s%d, ", string, i);
-	}
+    Queue_Foreach(new i : <queue>) {
+        if(values[Queue@idx_queue[i]] == i) 
+            ++values_count;
+    }
 
-	printf("%s (expected values: 100, 223, 54, 69, 79, 27, 47, 65, 85, 0)", string);
+    new str[64];
+    str = values_count == 5 ? "[Queue Tests] Foreach test passed. Elements:" : "[Queue Tests] Foreach test failed. Elements:";
+    _@Queue_Print_Values(queue, str);
+    return 1;
+} 
 
-	Queue_Clear(queueTest);
+_@Queue_Test_Functions() {
+    new 
+        Queue:queue<10, 50>, values_count;
 
-	Queue_InsertValue(queueTest, 65); 
-	Queue_InsertValue(queueTest, 70); 
-	Queue_InsertValue(queueTest, 85); 
-	Queue_InsertValue(queueTest, 90); 
-	Queue_InsertValue(queueTest, 100);
-	Queue_InsertValue(queueTest, 223);
+    //
+    //  Insert Test
+    //
 
-	string = "Queue Elements: ";
+    //Trying to insert negative values.
+    Queue_InsertValue(queue, -1);
+    Queue_InsertValue(queue, cellmin);
 
-	Queue_Foreach(new i : <queueTest>) {
-		format(string, sizeof string, Queue_GetBackValue(queueTest) == i ? "%s%d." : "%s%d, ", string, i);
-	}
+    //Trying to insert over the limit values. Limit should be 50.
+    Queue_InsertValue(queue, 51);
+    Queue_InsertValue(queue, cellmax);
 
-	printf("%s (expected values: 65, 70, 85, 90, 100, 223)", string);
+    //Stopping the test if the queue is not empty.
+    if(!Queue_IsEmpty(queue)) 
+        return print("[Queue Tests] Insert test failed. (queue not empty after adding invalid values)");
+    
+    //Insert some values.
+    new 
+        values[10] = {4, 6, 44, 2, 10, 0, 50};
 
-	Queue_Clear(queueTest);
+    for(new i = 0; i < 7; ++i) 
+        Queue_InsertValue(queue, values[i]);
 
-	print("\n\n\n ---- Testing done successfully ---- \n\n\n");
-}
+    //Check if the values are the correct ones.
+    Queue_Foreach(new i : <queue>) {
+        if(values[Queue@idx_queue[i]] == i)
+            values_count ++;
+    }
 
-_@Queue_Full_Test_() { 
-	print("\n\n\n ---- Test started ---- \n\n\n");
+    //Stopping the test if the queue values are not matching.
+    if(values_count != 7) {
+        print("[Queue Tests] Insert test failed. (queue values are not matching) Elements:");
 
-	new 
-		Queue:queueTest<10, 5000>;
+        new str[64];
+        _@Queue_Print_Values(queue, str);
 
-	Queue_InsertValue(queueTest, -5); //error
-	Queue_InsertValue(queueTest, 60000); //error
+        return 1;
+    }
 
-	printf("Queue Count: %d (expected: 0)", Queue_Count(queueTest));
+    //
+    //  Clear Test
+    //
 
-	Queue_InsertValue(queueTest, 8);
-	Queue_InsertValue(queueTest, 2);
-	Queue_InsertValue(queueTest, 3);
-	Queue_InsertValue(queueTest, 9);
-	Queue_InsertValue(queueTest, 8); //duplicate
-	Queue_InsertValue(queueTest, 3); //duplicate
+    //Clearing the queue.
+    Queue_Clear(queue);
 
-	printf("Queue Count: %d (expected: 4)", Queue_Count(queueTest));
+    //Checking if values are still in queue.
+    if(Queue_GetFrontValue(queue) != -1 || !Queue_IsEmpty(queue) || Queue@idx_queue[4] != -1) 
+        return print("[Queue Tests] Clear test failed. (values are still in queue)");
 
-	new 
-		string[256] = "Queue Elements: ";
+    else Queue_Foreach(new i : <queue>) 
+        return printf("[Queue Tests] Clear test failed. (values are still in queue)", i);
 
-	Queue_Foreach(new i : <queueTest>) {
-		format(string, sizeof string, Queue_GetBackValue(queueTest) == i ? "%s%d." : "%s%d, ", string, i);
-	}
+    //
+    //  Remove Test
+    //
 
-	printf("%s (expected values: 8, 2, 3, 9)", string);
+    //Insert some values.
+    new 
+        values_[10] = {5, 2, 7, 9, 8, 1, 4, 12, 15, 25};
 
-	Queue_RemoveFrontValue(queueTest); //removing 8
-	Queue_RemoveFrontValue(queueTest); //removing 2
+    for(new i = 0; i < 10; ++i) 
+        Queue_InsertValue(queue, values_[i]);
 
-	string = "Queue Elements: ";
+    //Remove some values.
+    Queue_RemoveValue(queue, 7);
+    Queue_RemoveValue(queue, 1);
+    Queue_RemoveValue(queue, 12);
+    Queue_RemoveValue(queue, 25);
+    Queue_RemoveValue(queue, 5);
 
-	Queue_Foreach(new i : <queueTest>) {
-		format(string, sizeof string, Queue_GetBackValue(queueTest) == i ? "%s%d." : "%s%d, ", string, i);
-	}
+    //Insert again some values.
+    Queue_InsertValue(queue, 33);
+    Queue_InsertValue(queue, 35);
+    Queue_InsertValue(queue, 32);
+    Queue_InsertValue(queue, 30);
 
-	printf("%s (expected values: 3, 9)", string);
+    //Remove some values.
+    Queue_RemoveValue(queue, 35);
+    Queue_RemoveValue(queue, 30);
+    Queue_RemoveFrontValue(queue);
 
-	printf("Queue Elements Positions: 3 (%d, expected 1), 9 (%d, expected 2), 5 (%d, expected -1)", Queue_GetValuePos(queueTest, 3), Queue_GetValuePos(queueTest, 9), Queue_GetValuePos(queueTest, 5));
+    //Trying to remove non-existing values.
+    Queue_RemoveValue(queue, 35);
+    Queue_RemoveValue(queue, 30);
+    Queue_RemoveValue(queue, 25);
 
-	Queue_InsertValue(queueTest, 65);
-	Queue_InsertValue(queueTest, 70);
-	Queue_InsertValue(queueTest, 85);
-	Queue_InsertValue(queueTest, 90);
-	Queue_InsertValue(queueTest, 100);
-	Queue_InsertValue(queueTest, 223);
-	Queue_InsertValue(queueTest, 89);
-	Queue_InsertValue(queueTest, 4999); 
-	Queue_InsertValue(queueTest, 18); //full queue, not added
-	Queue_InsertValue(queueTest, sizeof Queue@queueTest); //error
+    //Insert again some values.
+    Queue_InsertValue(queue, 6);
+    Queue_InsertValue(queue, 3);
+    Queue_InsertValue(queue, 12);
+    Queue_InsertValue(queue, 16);
 
-	string = "Queue Elements: ";
+    //Check if the values are the correct ones.
+    new 
+        values__[10] = {9, 8, 4, 15, 33, 32, 6, 3, 12, 16}, idx_;
 
-	Queue_Foreach(new i : <queueTest>) {
-		format(string, sizeof string, Queue_GetBackValue(queueTest) == i ? "%s%d." : "%s%d, ", string, i);
-	}
+    values_count = 0;
 
-	printf("%s (expected values: 3, 9, 65, 70, 85, 90, 100, 223, 89, 4999)", string);	
+    Queue_Foreach(new i : <queue>) {
+        if(values__[idx_++] == i)
+            values_count ++;
+    }
 
-	printf("IsFull: %d (expected: 1), IsEmpty: %d (expected: 0), Count: %d (expected: 10), BackValue: %d (expected: 4999 (%d)), FrontValue: %d (expected: 3 (%d))", Queue_IsFull(queueTest), Queue_IsEmpty(queueTest), Queue_Count(queueTest), Queue_GetBackValue(queueTest), Queue@idx_queueTest[4999], Queue_GetFrontValue(queueTest), Queue@idx_queueTest[3]);
+    if(values_count != 10) {
+        print("[Queue Tests] Remove test failed. (values count not matching). Elements:");
+        
+        new str[64];
+        _@Queue_Print_Values(queue, str);
 
-	Queue_Clear(queueTest);
+        return 1;
+    }
 
-	printf("Count: %d (expected: 0), Back: %d (expected: -1), Front: %d (expected: -1), Indexes: 3 (%d, expected: -1), 4999 (%d, expected: -1)", Queue_Count(queueTest), Queue_GetBackValue(queueTest), Queue_GetFrontValue(queueTest), Queue@idx_queueTest[3], Queue@idx_queueTest[4999]);
+    //
+    //  Getters/Others Test
+    //
 
-	print("\n\n\n ---- Testing done successfully! ----");
+    if(!Queue_IsFull(queue) || Queue_IsEmpty(queue) || Queue_Count(queue) != 10 || Queue_GetBackValue(queue) != 16 || Queue_GetFrontValue(queue) != 9 || Queue_GetValuePos(queue, 12) != 9 || !Queue_Contains(queue, 15) || 
+        Queue_Contains(queue, 69) || Queue_GetValuePos(queue, 69) != -1 || Queue_GetValuePos(queue, 16) != 10)
+        return print("[Queue Tests] Getters/Others test failed.");
+
+    return print("[Queue Tests] Tests ended. 4/4 passed.");
 }
