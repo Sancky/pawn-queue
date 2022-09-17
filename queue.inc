@@ -76,7 +76,10 @@
 /* ---------------------------------------------------------------- */
 
 #define Queue_GetBackValue(%0) \
-        (Queue@back_%0 != -1 ? Queue@%0[Queue@back_%0] : -1)
+        _Queue_GetBackValue(Queue@%0, Queue@back_%0)
+
+stock _Queue_GetBackValue(const queue[], back) 
+    return back != -1 ? queue[back] : -1;
 
 /* ---------------------------------------------------------------- */
 /*  Queue_GetBackValue(queue)                                       */
@@ -88,7 +91,10 @@
 /* ---------------------------------------------------------------- */
 
 #define Queue_GetFrontValue(%0) \
-        (Queue@front_%0 != -1 ? Queue@%0[Queue@front_%0] : -1)
+        _Queue_GetFrontValue(Queue@%0, Queue@front_%0)
+
+stock _Queue_GetFrontValue(const queue[], front) 
+    return front != -1 ? queue[front] : -1;
 
 /* ---------------------------------------------------------------- */
 /*  Queue_GetFrontValue(queue)                                      */
