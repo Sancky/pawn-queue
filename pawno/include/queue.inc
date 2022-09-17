@@ -25,8 +25,8 @@
 
 #define Queue_Foreach(new%0:<%1>) \
         Queue@count_%1[1] = 0; \
-        if(Queue@count_%1[0]) for(new idx = Queue@front_%1, %0 = Queue@%1[idx]; Queue@count_%1[1] < Queue@count_%1[0]; idx = (idx + 1) % sizeof Queue@%1, %0 = Queue@%1[idx], ++Queue@count_%1[1])
-        
+        if(Queue@count_%1[0]) for(new Q_Foreach@idx = Queue@front_%1, %0 = Queue@%1[Q_Foreach@idx]; Queue@count_%1[1] < Queue@count_%1[0]; Q_Foreach@idx = (Q_Foreach@idx + 1) % sizeof Queue@%1, %0 = Queue@%1[Q_Foreach@idx], ++Queue@count_%1[1])
+
 /*
     e.g: 
 
