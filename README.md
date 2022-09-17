@@ -17,4 +17,4 @@ If you found any issues with the library, post it on [issues](https://github.com
 If you want to contribute with something, make a fork and create an [pull request](https://github.com/Sancky/pawn-queue/pulls).
 
 ## Documentation
-soon
+You can find the documentation [here](https://github.com/Sancky/pawn-queue/wiki).
