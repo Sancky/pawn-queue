@@ -4,7 +4,7 @@
  An queue data structure implementation for PAWN using circular algorithm.
 
 ## Installation
-1. Get the include [queue.inc](https://github.com/Sancky/pawn-queue/blob/main/queue.inc)
+1. Get the include [queue.inc](https://github.com/Sancky/pawn-queue/blob/main/pawno/include/queue.inc)
 2. Include the library in your PAWN script:
 ```PAWN
 #include <queue>
