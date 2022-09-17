@@ -253,13 +253,10 @@ stock _Queue_GetValuePos(const indexes[], size_indexes, size_queue, front, back,
     if(!count || (value < 0 || value >= size_indexes) || indexes[value] == -1)
         return -1;
 
-    if(indexes[value] >= front) 
-        return indexes[value] - front + 1;
-
     if(back < front && indexes[value] <= back)
-        return size_queue + indexes[value] - front + 1;
+        return size_queue + (indexes[value] - front + 1);
 
-    return -1;
+    return indexes[value] - front + 1;
 }
 
 /* ---------------------------------------------------------------- */
