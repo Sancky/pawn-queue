@@ -210,31 +210,17 @@ stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, s
 /*  Returns the removed value, otherwise -1 if function failed.     */
 /* ---------------------------------------------------------------- */
 
-#if defined MemSet || defined memset
-    #define Queue_Clear(%0) \
-            _Queue_Clear(Queue@idx_%0, sizeof Queue@idx_%0, Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
+#define Queue_Clear(%0) \
+        _Queue_Clear(Queue@%0, Queue@idx_%0, Queue@size_%0, Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
 
-    stock bool:_Queue_Clear(const indexes[], size_indexes, &count, &front, &back) 
-#else
-    #define Queue_Clear(%0) \
-            _Queue_Clear(Queue@%0, Queue@idx_%0, sizeof Queue@%0, Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
-
-    stock bool:_Queue_Clear(const queue[], indexes[], size_queue, &count, &front, &back) 
-#endif
-{
+stock bool:_Queue_Clear(const queue[], indexes[], size_queue, &count, &front, &back)  {
     if(count) { 
-        #if defined MemSet
-            MemSet(indexes, -1, size_indexes);
-        #elseif defined memset 
-            memset(indexes, -1, size_indexes);
-        #else 
-            for(new idx = front;; idx = (idx + 1) % size_queue) {
-                indexes[queue[idx]] = -1;
-                
-                if(idx == back)
-                    break;
-            }
-        #endif
+        for(new idx = front;; idx = (idx + 1) % size_queue) {
+            indexes[queue[idx]] = -1;
+            
+            if(idx == back)
+                break;
+        }
  
         count = 0;
         front = back = -1; 
