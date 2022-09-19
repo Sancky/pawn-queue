@@ -13,19 +13,6 @@
 #define QueueArray:%0[%1]<%2,%3> /*1d array support*/ \
         Queue@%0[%1][%2], Queue@idx_%0[%1][%3 + 1], Queue@front_%0[%1] = {-1, ...}, Queue@back_%0[%1] = {-1, ...}, Queue@count_%0[%1][2], Queue@size_%0[%1] = {%2, ...}
 
-/*
-    e.g: 
-
-        new Queue:queue<100, 1000>;
-
-        * for 1D arrays use
-
-        new QueueArray:queue[100]<100, 1000>;
-
-        100 = size of the queue.
-        1000 = maximum value which can be inserted in queue.
-*/
-
 // ------------------------------------- //
 //        Foreach Implementation         //
 // ------------------------------------- //
@@ -33,16 +20,6 @@
 #define Queue_Foreach(new%0:<%1>) \
         Queue@count_%1[1] = 0; \
         if(Queue@count_%1[0]) for(new Q_Foreach@idx = Queue@front_%1, %0 = Queue@%1[Q_Foreach@idx]; Queue@count_%1[1] < Queue@count_%1[0]; Q_Foreach@idx = (Q_Foreach@idx + 1) % Queue@size_%1, %0 = Queue@%1[Q_Foreach@idx], ++Queue@count_%1[1])
-/*
-    e.g: 
-
-        Queue_Foreach(new val : <queue>) 
-        {
-            
-        }
-
-        Loop through an queue elements.
-*/
 
 // ------------------------------------- //
 //              Functions                //
