@@ -8,12 +8,19 @@
 // ------------------------------------- //
 
 #define Queue:%0<%1,%2> \
-        Queue@%0[%1], Queue@idx_%0[%2 + 1] = {-1, ...}, Queue@front_%0 = -1, Queue@back_%0 = -1, Queue@count_%0[2]
+        Queue@%0[%1], Queue@idx_%0[%2 + 1] = {-1, ...}, Queue@front_%0 = -1, Queue@back_%0 = -1, Queue@count_%0[2], Queue@size_%0 = %1
+
+#define QueueArray:%0[%1]<%2,%3> /*1d array support*/ \
+        Queue@%0[%1][%2], Queue@idx_%0[%1][%3 + 1], Queue@front_%0[%1] = {-1, ...}, Queue@back_%0[%1] = {-1, ...}, Queue@count_%0[%1][2], Queue@size_%0[%1] = {%2, ...}
 
 /*
     e.g: 
 
-        new Queue:queueName<100, 1000>;
+        new Queue:queue<100, 1000>;
+
+        * for 1D arrays use
+
+        new QueueArray:queue[100]<100, 1000>;
 
         100 = size of the queue.
         1000 = maximum value which can be inserted in queue.
@@ -25,12 +32,11 @@
 
 #define Queue_Foreach(new%0:<%1>) \
         Queue@count_%1[1] = 0; \
-        if(Queue@count_%1[0]) for(new Q_Foreach@idx = Queue@front_%1, %0 = Queue@%1[Q_Foreach@idx]; Queue@count_%1[1] < Queue@count_%1[0]; Q_Foreach@idx = (Q_Foreach@idx + 1) % sizeof Queue@%1, %0 = Queue@%1[Q_Foreach@idx], ++Queue@count_%1[1])
-
+        if(Queue@count_%1[0]) for(new Q_Foreach@idx = Queue@front_%1, %0 = Queue@%1[Q_Foreach@idx]; Queue@count_%1[1] < Queue@count_%1[0]; Q_Foreach@idx = (Q_Foreach@idx + 1) % Queue@size_%1, %0 = Queue@%1[Q_Foreach@idx], ++Queue@count_%1[1])
 /*
     e.g: 
 
-        Queue_Foreach(new val : <queueName>) 
+        Queue_Foreach(new val : <queue>) 
         {
             
         }
@@ -43,7 +49,7 @@
 // ------------------------------------- //
 
 #define Queue_IsFull(%0) \
-        (Queue@count_%0[0] == (sizeof Queue@%0))
+        (Queue@count_%0[0] == Queue@size_%0)
 
 /* ---------------------------------------------------------------- */
 /*  Queue_IsFull(queue)                                             */
@@ -106,9 +112,9 @@ stock _Queue_GetFrontValue(const queue[], front)
 /* ---------------------------------------------------------------- */
 
 #define Queue_InsertValue(%0,%1) \
-        _Queue_InsertValue(Queue@%0, Queue@idx_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], sizeof Queue@%0, sizeof Queue@idx_%0, %1)
+        _Queue_InsertValue(Queue@%0, Queue@idx_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], Queue@size_%0, _, %1)
 
-stock bool:_Queue_InsertValue(queue[], indexes[], &front, &back, &count, size_queue, size_indexes, value) {
+stock bool:_Queue_InsertValue(queue[], indexes[], &front, &back, &count, size_queue, size_indexes = sizeof indexes, value) {
     if(count == size_queue || (value < 0 || value >= size_indexes) || indexes[value] != -1)
         return false;
 
@@ -133,9 +139,9 @@ stock bool:_Queue_InsertValue(queue[], indexes[], &front, &back, &count, size_qu
 /* ---------------------------------------------------------------- */
 
 #define Queue_RemoveValue(%0,%1) \
-        _Queue_RemoveValue(Queue@%0, Queue@idx_%0, sizeof Queue@%0, sizeof Queue@idx_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], %1) 
+        _Queue_RemoveValue(Queue@%0, Queue@idx_%0, Queue@size_%0, _, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], %1) 
 
-stock bool:_Queue_RemoveValue(queue[], indexes[], size_queue, size_indexes, &front, &back, &count, value) {
+stock bool:_Queue_RemoveValue(queue[], indexes[], size_queue, size_indexes = sizeof indexes, &front, &back, &count, value) {
     if(!count || (value < 0 || value >= size_indexes) || indexes[value] == -1) 
         return false;
 
@@ -174,7 +180,7 @@ stock bool:_Queue_RemoveValue(queue[], indexes[], size_queue, size_indexes, &fro
 /* ---------------------------------------------------------------- */
 
 #define Queue_RemoveFrontValue(%0) \
-        _Queue_RemoveFrontValue(Queue@%0, Queue@idx_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], sizeof Queue@%0)
+        _Queue_RemoveFrontValue(Queue@%0, Queue@idx_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], Queue@size_%0)
 
 stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, size) {
     if(!count) 
@@ -247,9 +253,9 @@ stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, s
 /* ---------------------------------------------------------------- */
 
 #define Queue_GetValuePos(%0,%1) \
-        _Queue_GetValuePos(Queue@idx_%0, sizeof Queue@idx_%0, sizeof Queue@%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], %1)
+        _Queue_GetValuePos(Queue@idx_%0, _, Queue@size_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], %1)
 
-stock _Queue_GetValuePos(const indexes[], size_indexes, size_queue, front, back, count, value) {
+stock _Queue_GetValuePos(const indexes[], size_indexes = sizeof indexes, size_queue, front, back, count, value) {
     if(!count || (value < 0 || value >= size_indexes) || indexes[value] == -1)
         return -1;
 
@@ -269,9 +275,9 @@ stock _Queue_GetValuePos(const indexes[], size_indexes, size_queue, front, back,
 /* ---------------------------------------------------------------- */
 
 #define Queue_Contains(%0,%1) \
-        _Queue_Contains(Queue@idx_%0, sizeof Queue@idx_%0, Queue@count_%0[0], %1)
+        _Queue_Contains(Queue@idx_%0, _, Queue@count_%0[0], %1)
 
-stock bool:_Queue_Contains(const indexes[], size_indexes, count, value) 
+stock bool:_Queue_Contains(const indexes[], size_indexes = sizeof indexes, count, value) 
     return (count && (value >= 0 && value < size_indexes) && indexes[value] != -1);
 
 /* ---------------------------------------------------------------- */
@@ -281,4 +287,24 @@ stock bool:_Queue_Contains(const indexes[], size_indexes, count, value)
 /*                                                                  */
 /*                                                                  */
 /*  Returns true if value exists, otherwise false.                  */
+/* ---------------------------------------------------------------- */
+
+#define Queue_Init(%0) \
+        _Queue_Init(Queue@idx_%0, _, _) 
+
+stock _Queue_Init(indexes[][], size_1 = sizeof indexes, size_2 = sizeof indexes[]) {
+    for(new i = 0; i < size_1; ++i) {
+        for(new idx = 0; idx < size_2; ++idx)
+            indexes[i][idx] = -1;  
+    }
+    return 1;
+}
+
+/* ---------------------------------------------------------------- */
+/*  Queue_Init(queue)                                               */
+/*                                                                  */
+/*  Initialise an queue array.                                      */
+/*                                                                  */
+/*  IMPORTANT! Use it only ONCE before first use of an queue        */
+/*  array to work properly.                                         */
 /* ---------------------------------------------------------------- */
