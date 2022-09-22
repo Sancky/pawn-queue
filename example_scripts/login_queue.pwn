@@ -16,7 +16,7 @@ public OnPlayerConnect(playerid) {
 }
 
 public OnPlayerDisconnect(playerid, reason) {
-	// If the player is in queue, remove him, but if is first in queue we need to show the next player login/register dialog.
+	// If the player is in queue, remove him, but if is first in queue we need to show to next player login/register dialog.
 
 	if(Queue_Contains(loginQueue, playerid)) {
 		if(Queue_GetFrontValue(loginQueue) == playerid) { 
@@ -34,7 +34,7 @@ public OnPlayerDisconnect(playerid, reason) {
 }
 
 public OnPlayerLoginOrRegister() { // (just an example of function, the code below should be called when a player log in or register)
-	// When a player log in or register, remove him from queue and show the next player the login/register dialog.
+	// When a player log in or register, remove him from queue and show to next player the login/register dialog.
 
 	Queue_RemoveFrontValue(loginQueue); 
 
