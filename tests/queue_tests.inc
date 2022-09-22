@@ -93,7 +93,7 @@ _@Queue_Test_Functions() {
     Queue_Clear(queue);
 
     //Checking if values are still in queue.
-    if(Queue_GetFrontValue(queue) != -1 || !Queue_IsEmpty(queue) || Queue@idx_queue[4] != -1) 
+    if(Queue_GetFrontValue(queue) != INVALID_QUEUE_VALUE || !Queue_IsEmpty(queue) || Queue@idx_queue[4] != INVALID_QUEUE_VALUE) 
         return print("[Queue Tests] Clear test failed. (values are still in queue)");
 
     else Queue_Foreach(new i : <queue>) 
@@ -164,8 +164,8 @@ _@Queue_Test_Functions() {
     //
 
     if(!Queue_IsFull(queue) || Queue_IsEmpty(queue) || Queue_Count(queue) != 10 || Queue_GetBackValue(queue) != 16 || Queue_GetFrontValue(queue) != 9 || Queue_GetValuePos(queue, 12) != 9 || !Queue_Contains(queue, 15) || 
-        Queue_Contains(queue, 69) || Queue_GetValuePos(queue, 69) != -1 || Queue_GetValuePos(queue, 16) != 10)
+        Queue_Contains(queue, 69) || Queue_GetValuePos(queue, 69) != INVALID_QUEUE_VALUE || Queue_GetValuePos(queue, 16) != 10)
         return print("[Queue Tests] Getters/Others test failed.");
 
     return print("[Queue Tests] Tests ended. 4/4 passed.");
-}
+} 
