@@ -18,16 +18,11 @@ public OnPlayerConnect(playerid) {
 public OnPlayerDisconnect(playerid, reason) {
 	// If the player is in queue, remove him, but if is first in queue we need to show to next player login/register dialog.
 
-	if(Queue_Contains(loginQueue, playerid)) {
-		if(Queue_GetFrontValue(loginQueue) == playerid) { 
-			Queue_RemoveFrontValue(loginQueue); 
-			
-			if(!Queue_IsEmpty(loginQueue)) { // Sanity check in case if the queue is empty. 
-				ShowPlayerDialog(Queue_GetFrontValue(loginQueue), ...);		
-			}
-		}
-		else { 
-			Queue_RemoveValue(loginQueue, playerid); 
+	new const front = Queue_GetFrontValue(loginQueue);
+
+	if(Queue_RemoveValue(loginQueue, playerid)) {
+		if(front == playerid && !Queue_IsEmpty(loginQueue)) {
+			ShowPlayerDialog(Queue_GetFrontValue(loginQueue), ...);	
 		}
 	}
 	return 1;
