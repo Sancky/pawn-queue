@@ -13,11 +13,11 @@
 //              Definition               //
 // ------------------------------------- //
 
-#define Queue:%0<%1,%2> \
-        Queue@%0[%1], Queue@idx_%0[%2 + 1] = {INVALID_QUEUE_VALUE, ...}, Queue@front_%0 = INVALID_QUEUE_VALUE, Queue@back_%0 = INVALID_QUEUE_VALUE, Queue@count_%0[2], Queue@size_%0 = %1
+#define Queue:%0<%1> \
+        Queue@%0[%1], Queue@front_%0 = INVALID_QUEUE_VALUE, Queue@back_%0 = INVALID_QUEUE_VALUE, Queue@count_%0[2], Queue@size_%0 = %1
 
-#define QueueArray:%0[%1]<%2,%3> /*1d array support*/ \
-        Queue@%0[%1][%2], Queue@idx_%0[%1][%3 + 1], Queue@front_%0[%1] = {INVALID_QUEUE_VALUE, ...}, Queue@back_%0[%1] = {INVALID_QUEUE_VALUE, ...}, Queue@count_%0[%1][2], Queue@size_%0[%1] = {%2, ...}
+#define QueueArray:%0[%1]<%2> /*1d array support*/ \
+        Queue@%0[%1][%2], Queue@front_%0[%1] = {INVALID_QUEUE_VALUE, ...}, Queue@back_%0[%1] = {INVALID_QUEUE_VALUE, ...}, Queue@count_%0[%1][2], Queue@size_%0[%1] = {%2, ...}
 
 // ------------------------------------- //
 //        Foreach Implementation         //
@@ -96,18 +96,17 @@ stock _Queue_GetFrontValue(const queue[], front)
 /* ---------------------------------------------------------------- */
 
 #define Queue_InsertValue(%0,%1) \
-        _Queue_InsertValue(Queue@%0, Queue@idx_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], Queue@size_%0, _, %1)
+        _Queue_InsertValue(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], Queue@size_%0, _Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0[0], %1), %1)
 
-stock bool:_Queue_InsertValue(queue[], indexes[], &front, &back, &count, size_queue, size_indexes = sizeof indexes, value) {
-    if(count == size_queue || (value < 0 || value >= size_indexes) || indexes[value] != INVALID_QUEUE_VALUE)
+stock bool:_Queue_InsertValue(queue[], &front, &back, &count, size, value_index, value) {
+    if(count == size || value_index != INVALID_QUEUE_VALUE)
         return false;
 
     if(front == INVALID_QUEUE_VALUE) 
         front = 0;
 
-    back = (back + 1) % size_queue;
+    back = (back + 1) % size;
     queue[back] = value;
-    indexes[value] = back;
 
     count ++;
     return true;
@@ -123,31 +122,27 @@ stock bool:_Queue_InsertValue(queue[], indexes[], &front, &back, &count, size_qu
 /* ---------------------------------------------------------------- */
 
 #define Queue_RemoveValue(%0,%1) \
-        _Queue_RemoveValue(Queue@%0, Queue@idx_%0, Queue@size_%0, _, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], %1) 
+        _Queue_RemoveValue(Queue@%0, Queue@size_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], _Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0[0], %1)) 
 
-stock bool:_Queue_RemoveValue(queue[], indexes[], size_queue, size_indexes = sizeof indexes, &front, &back, &count, value) {
-    if(!count || (value < 0 || value >= size_indexes) || indexes[value] == INVALID_QUEUE_VALUE) 
+stock bool:_Queue_RemoveValue(queue[], size, &front, &back, &count, value_index) {
+    if(value_index == INVALID_QUEUE_VALUE) 
         return false;
 
     if(front == back)
         front = back = INVALID_QUEUE_VALUE;
 
-    else if(front == indexes[value]) 
-        front = (front + 1) % size_queue;
+    else if(front == value_index) 
+        front = (front + 1) % size;
     
-    else if(back == indexes[value]) 
-        back = (back - 1) % size_queue;
+    else if(back == value_index) 
+        back = (back - 1) % size;
 
     else {
-        for(new i = indexes[value]; i != back; i = (i + 1) % size_queue) {
-            queue[i] = queue[(i + 1) % size_queue];
-            indexes[queue[i]] = i;
-        }   
+        for(new i = value_index; i != back; i = (i + 1) % size) 
+            queue[i] = queue[(i + 1) % size];
 
-        back = (back - 1) % size_queue;   
+        back = (back - 1) % size;   
     }
-
-    indexes[value] = INVALID_QUEUE_VALUE;
     
     count --;
 
@@ -164,15 +159,13 @@ stock bool:_Queue_RemoveValue(queue[], indexes[], size_queue, size_indexes = siz
 /* ---------------------------------------------------------------- */
 
 #define Queue_RemoveFrontValue(%0) \
-        _Queue_RemoveFrontValue(Queue@%0, Queue@idx_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], Queue@size_%0)
+        _Queue_RemoveFrontValue(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], Queue@size_%0)
 
-stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, size) {
+stock _Queue_RemoveFrontValue(const queue[], &front, &back, &count, size) {
     if(!count) 
         return INVALID_QUEUE_VALUE;
 
     new const value = queue[front];
-
-    indexes[value] = INVALID_QUEUE_VALUE;
 
     count --;
 
@@ -196,17 +189,10 @@ stock _Queue_RemoveFrontValue(const queue[], indexes[], &front, &back, &count, s
 /* ---------------------------------------------------------------- */
 
 #define Queue_Clear(%0) \
-        _Queue_Clear(Queue@%0, Queue@idx_%0, Queue@size_%0, Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
+        _Queue_Clear(Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
 
-stock bool:_Queue_Clear(const queue[], indexes[], size_queue, &count, &front, &back)  {
+stock bool:_Queue_Clear(&count, &front, &back)  {
     if(count) { 
-        for(new idx = front;; idx = (idx + 1) % size_queue) {
-            indexes[queue[idx]] = INVALID_QUEUE_VALUE;
-            
-            if(idx == back)
-                break;
-        }
- 
         count = 0;
         front = back = INVALID_QUEUE_VALUE; 
         return true;
@@ -224,16 +210,16 @@ stock bool:_Queue_Clear(const queue[], indexes[], size_queue, &count, &front, &b
 /* ---------------------------------------------------------------- */
 
 #define Queue_GetValuePos(%0,%1) \
-        _Queue_GetValuePos(Queue@idx_%0, _, Queue@size_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], %1)
+        _Queue_GetValuePos(Queue@size_%0, Queue@front_%0, Queue@back_%0, _Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0[0], %1))
 
-stock _Queue_GetValuePos(const indexes[], size_indexes = sizeof indexes, size_queue, front, back, count, value) {
-    if(!count || (value < 0 || value >= size_indexes) || indexes[value] == INVALID_QUEUE_VALUE)
+stock _Queue_GetValuePos(size, front, back, value_index) {
+    if(value_index == INVALID_QUEUE_VALUE)
         return INVALID_QUEUE_VALUE;
 
-    if(back < front && indexes[value] <= back)
-        return size_queue + (indexes[value] - front + 1);
+    if(back < front && value_index <= back)
+        return size + (value_index - front + 1);
 
-    return indexes[value] - front + 1;
+    return value_index - front + 1;
 }
 
 /* ---------------------------------------------------------------- */
@@ -247,10 +233,7 @@ stock _Queue_GetValuePos(const indexes[], size_indexes = sizeof indexes, size_qu
 /* ---------------------------------------------------------------- */
 
 #define Queue_Contains(%0,%1) \
-        _Queue_Contains(Queue@idx_%0, _, Queue@count_%0[0], %1)
-
-stock bool:_Queue_Contains(const indexes[], size_indexes = sizeof indexes, count, value) 
-    return (count && (value >= 0 && value < size_indexes) && indexes[value] != INVALID_QUEUE_VALUE);
+        (_Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0[0], %1) != INVALID_QUEUE_VALUE)
 
 /* ---------------------------------------------------------------- */
 /*  Queue_Contains(queue, value)                                    */
@@ -261,22 +244,29 @@ stock bool:_Queue_Contains(const indexes[], size_indexes = sizeof indexes, count
 /*  Returns true if value exists, otherwise false.                  */
 /* ---------------------------------------------------------------- */
 
-#define Queue_Init(%0) \
-        _Queue_Init(Queue@idx_%0, _, _) 
+// ------------------------------------- //
+//          Internal Functions           //
+// ------------------------------------- //
 
-stock _Queue_Init(indexes[][], size_1 = sizeof indexes, size_2 = sizeof indexes[]) {
-    for(new i = 0; i < size_1; ++i) {
-        for(new idx = 0; idx < size_2; ++idx)
-            indexes[i][idx] = INVALID_QUEUE_VALUE;  
+stock _Queue_GetValueIndex(const queue[], front, back, size, count, value) {
+    if(!count || (value < cellmin || value > cellmax))
+        return INVALID_QUEUE_VALUE;
+
+    for(new i = front;; i = (i + 1) % size) {
+        if(queue[i] == value)
+            return i;
+
+        if(i == back) 
+            break;
     }
-    return 1;
+    return INVALID_QUEUE_VALUE;
 }
 
 /* ---------------------------------------------------------------- */
-/*  Queue_Init(queue)                                               */
+/*  _Queue_GetValueIndex(queue, value)                              */
 /*                                                                  */
-/*  Initialise an queue array.                                      */
+/*  Get the index for a specific value from queue.                  */
 /*                                                                  */
-/*  IMPORTANT! Use it only ONCE before first use of an queue        */
-/*  array to work properly.                                         */
+/*                                                                  */
+/*  Returns the value's index, otherwise INVALID_QUEUE_VALUE.       */
 /* ---------------------------------------------------------------- */

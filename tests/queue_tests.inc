@@ -13,7 +13,7 @@
 
 _@Queue_Test_Foreach() {
     new 
-        Queue:queue<10, 1000>;
+        Queue:queue<10>;
 
     //Loop through an empty queue.
     Queue_Foreach(new i : <queue>) {
@@ -21,18 +21,18 @@ _@Queue_Test_Foreach() {
     }
 
     //Insert some values
-    Queue_InsertValue(queue, 3);
-    Queue_InsertValue(queue, 2);
-    Queue_InsertValue(queue, 5);
-    Queue_InsertValue(queue, 1);
-    Queue_InsertValue(queue, 6);
+    new     
+        values[10] = {3, 2, 5, 1, 6};
+
+    for(new i = 0; i < 5; ++i) 
+        Queue_InsertValue(queue, values[i]);
 
     //Check if the values are the correct ones.
     new 
-        values[10] = {3, 2, 5, 1, 6}, values_count;
+        values_count;
 
     Queue_Foreach(new i : <queue>) {
-        if(values[Queue@idx_queue[i]] == i) 
+        if(values[_Queue_GetValueIndex(Queue@queue, Queue@front_queue, Queue@back_queue, Queue@size_queue, Queue@count_queue[0], i)] == i) 
             ++values_count;
     }
 
@@ -44,39 +44,27 @@ _@Queue_Test_Foreach() {
 
 _@Queue_Test_Functions() {
     new 
-        Queue:queue<10, 50>, values_count;
+        Queue:queue<10>, values_count;
 
     //
     //  Insert Test
     //
-
-    //Trying to insert negative values.
-    Queue_InsertValue(queue, -1);
-    Queue_InsertValue(queue, cellmin);
-
-    //Trying to insert over the limit values. Limit should be 50.
-    Queue_InsertValue(queue, 51);
-    Queue_InsertValue(queue, cellmax);
-
-    //Stopping the test if the queue is not empty.
-    if(!Queue_IsEmpty(queue)) 
-        return print("[Queue Tests] Insert test failed. (queue not empty after adding invalid values)");
     
     //Insert some values.
     new 
-        values[10] = {4, 6, 44, 2, 10, 0, 50};
+        values[10] = {4, -5, 6, 44, 2, 10, 0, 50};
 
-    for(new i = 0; i < 7; ++i) 
+    for(new i = 0; i < 8; ++i) 
         Queue_InsertValue(queue, values[i]);
 
     //Check if the values are the correct ones.
     Queue_Foreach(new i : <queue>) {
-        if(values[Queue@idx_queue[i]] == i)
+        if(values[_Queue_GetValueIndex(Queue@queue, Queue@front_queue, Queue@back_queue, Queue@size_queue, Queue@count_queue[0], i)] == i)
             values_count ++;
     }
 
     //Stopping the test if the queue values are not matching.
-    if(values_count != 7) {
+    if(values_count != 8) {
         print("[Queue Tests] Insert test failed. (queue values are not matching) Elements:");
 
         new str[64];
@@ -93,7 +81,7 @@ _@Queue_Test_Functions() {
     Queue_Clear(queue);
 
     //Checking if values are still in queue.
-    if(Queue_GetFrontValue(queue) != INVALID_QUEUE_VALUE || !Queue_IsEmpty(queue) || Queue@idx_queue[4] != INVALID_QUEUE_VALUE) 
+    if(Queue_GetFrontValue(queue) != INVALID_QUEUE_VALUE || !Queue_IsEmpty(queue)) 
         return print("[Queue Tests] Clear test failed. (values are still in queue)");
 
     else Queue_Foreach(new i : <queue>) 
@@ -168,4 +156,4 @@ _@Queue_Test_Functions() {
         return print("[Queue Tests] Getters/Others test failed.");
 
     return print("[Queue Tests] Tests ended. 4/4 passed.");
-} 
+}
