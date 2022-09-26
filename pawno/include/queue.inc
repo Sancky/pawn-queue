@@ -10,6 +10,16 @@
 #define INVALID_QUEUE_VALUE -1  
 
 // ------------------------------------- //
+//             Macro guards              //
+// ------------------------------------- //
+
+#define Queue@%0\32; Queue@
+#define Queue@front_%0\32; Queue@front_
+#define Queue@back_%0\32; Queue@back_
+#define Queue@count_%0\32; Queue@count_
+#define Queue@size_%0\32; Queue@size_
+
+// ------------------------------------- //
 //              Definition               //
 // ------------------------------------- //
 
