@@ -2,7 +2,7 @@
 #include <queue>
 
 new 
-	Queue:loginQueue<MAX_PLAYERS, MAX_PLAYERS>; // Create an global queue variable with MAX_PLAYERS sizes.
+	Queue:loginQueue<MAX_PLAYERS>; // Create an global queue variable with MAX_PLAYERS size.
 
 public OnPlayerConnect(playerid) {
 	// When a player connects, add him in queue and if is first show him the login/register dialog.
