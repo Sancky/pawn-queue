@@ -249,7 +249,7 @@ stock _Queue_GetValuePos(size, front, back, value_index) {
 // ------------------------------------- //
 
 stock _Queue_GetValueIndex(const queue[], front, back, size, count, value) {
-    if(!count || (value < cellmin || value > cellmax))
+    if(!count)
         return INVALID_QUEUE_VALUE;
 
     for(new i = front;; i = (i + 1) % size) {
