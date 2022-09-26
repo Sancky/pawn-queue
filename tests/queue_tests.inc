@@ -31,8 +31,8 @@ _@Queue_Test_Foreach() {
     new 
         values_count;
 
-    Queue_Foreach(new i : queue) {
-        if(values[_Queue_GetValueIndex(Queue@queue, Queue@front_queue, Queue@back_queue, Queue@size_queue, Queue@count_queue[0], i)] == i) 
+    Queue_ForeachEx(new i, idx : queue) {
+        if(values[idx] == i) 
             ++values_count;
     }
 
@@ -58,8 +58,8 @@ _@Queue_Test_Functions() {
         Queue_InsertValue(queue, values[i]);
 
     //Check if the values are the correct ones.
-    Queue_Foreach(new i : queue) {
-        if(values[_Queue_GetValueIndex(Queue@queue, Queue@front_queue, Queue@back_queue, Queue@size_queue, Queue@count_queue[0], i)] == i)
+    Queue_ForeachEx(new i, idx : queue) {
+        if(values[idx] == i)
             values_count ++;
     }
 
