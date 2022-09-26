@@ -5,7 +5,7 @@
 // ------------------------------------- //
 
 #define _@Queue_Print_Values(%0,%1) \
-        Queue_Foreach(new i : <%0>) format(%1, sizeof %1, "%s %d", %1, i); print(%1)
+        Queue_Foreach(new i : %0) format(%1, sizeof %1, "%s %d", %1, i); print(%1)
 
 // ------------------------------------- //
 //              Tests                    //
@@ -16,7 +16,7 @@ _@Queue_Test_Foreach() {
         Queue:queue<10>;
 
     //Loop through an empty queue.
-    Queue_Foreach(new i : <queue>) {
+    Queue_Foreach(new i : queue) {
         #pragma unused i
     }
 
@@ -31,7 +31,7 @@ _@Queue_Test_Foreach() {
     new 
         values_count;
 
-    Queue_Foreach(new i : <queue>) {
+    Queue_Foreach(new i : queue) {
         if(values[_Queue_GetValueIndex(Queue@queue, Queue@front_queue, Queue@back_queue, Queue@size_queue, Queue@count_queue[0], i)] == i) 
             ++values_count;
     }
@@ -58,7 +58,7 @@ _@Queue_Test_Functions() {
         Queue_InsertValue(queue, values[i]);
 
     //Check if the values are the correct ones.
-    Queue_Foreach(new i : <queue>) {
+    Queue_Foreach(new i : queue) {
         if(values[_Queue_GetValueIndex(Queue@queue, Queue@front_queue, Queue@back_queue, Queue@size_queue, Queue@count_queue[0], i)] == i)
             values_count ++;
     }
@@ -84,7 +84,7 @@ _@Queue_Test_Functions() {
     if(Queue_GetFrontValue(queue) != INVALID_QUEUE_VALUE || !Queue_IsEmpty(queue)) 
         return print("[Queue Tests] Clear test failed. (values are still in queue)");
 
-    else Queue_Foreach(new i : <queue>) 
+    else Queue_Foreach(new i : queue) 
         return printf("[Queue Tests] Clear test failed. (values are still in queue)", i);
 
     //
@@ -133,7 +133,7 @@ _@Queue_Test_Functions() {
 
     values_count = 0;
 
-    Queue_Foreach(new i : <queue>) {
+    Queue_Foreach(new i : queue) {
         if(values__[idx_++] == i)
             values_count ++;
     }
