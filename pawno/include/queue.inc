@@ -262,16 +262,16 @@ stock _Queue_GetValuePos(size, front, back, value_index) {
 //          Internal Functions           //
 // ------------------------------------- //
 
-stock _Queue_GetValueIndex(const queue[], front, back, size, count, value) {
+stock _Queue_GetValueIndex(const queue[], idx, end, size, count, value) {
     if(!count)
         return INVALID_QUEUE_VALUE;
 
-    for(new i = front;; i = (i + 1) % size) {
-        if(queue[i] == value)
-            return i;
+    if(queue[end] == value)
+        return end;
 
-        if(i == back) 
-            break;
+    while((idx = (idx + 1) % size) != end) {
+        if(queue[idx] == value)
+            return idx;
     }
     return INVALID_QUEUE_VALUE;
 }
