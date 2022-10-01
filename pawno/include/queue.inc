@@ -266,12 +266,12 @@ stock _Queue_GetValueIndex(const queue[], front, back, size, count, value) {
     if(!count)
         return INVALID_QUEUE_VALUE;
 
-    if(queue[back] == value)
-        return back;
-
-    for(new i = front; i != back; i = (i + 1) % size) {
+    for(new i = front;; i = (i + 1) % size) {
         if(queue[i] == value)
             return i;
+
+        if(i == back) 
+            break;
     }
     return INVALID_QUEUE_VALUE;
 }
