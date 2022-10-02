@@ -205,13 +205,11 @@ stock _Queue_RemoveFrontValue(const queue[], &front, &back, &count, size) {
 #define Queue_Clear(%0) \
         _Queue_Clear(Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
 
-stock bool:_Queue_Clear(&count, &front, &back)  {
+stock _Queue_Clear(&count, &front, &back)  {
     if(count) { 
         count = 0;
         front = back = INVALID_QUEUE_VALUE; 
-        return true;
     }
-    return false;
 }
 
 /* ---------------------------------------------------------------- */
@@ -220,7 +218,7 @@ stock bool:_Queue_Clear(&count, &front, &back)  {
 /*  Clear the queue.                                                */
 /*                                                                  */
 /*                                                                  */
-/*  Returns true for success, otherwise false.                      */
+/*  Doesn't return anything.                                        */
 /* ---------------------------------------------------------------- */
 
 #define Queue_GetValuePos(%0,%1) \
