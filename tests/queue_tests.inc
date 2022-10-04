@@ -20,11 +20,11 @@ _@Queue_Test_Foreach() {
         #pragma unused i
     }
 
-    //Insert some values
+    //Insert some values.
     new     
-        values[10] = {3, 2, 5, 1, 6};
+        values[5] = {3, 2, 5, 1, 6};
 
-    for(new i = 0; i < 5; ++i) 
+    for(new i = 0; i < sizeof values; ++i) 
         Queue_InsertValue(queue, values[i]);
 
     //Check if the values are the correct ones.
@@ -36,8 +36,46 @@ _@Queue_Test_Foreach() {
             ++values_count;
     }
 
-    new str[64];
-    str = values_count == 5 ? "[Queue Tests] Foreach test passed. Elements:" : "[Queue Tests] Foreach test failed. Elements:";
+    if(values_count != 5) {
+        new str[64] = "[Queue Tests] Foreach test 1 failed. Elements:";
+
+        _@Queue_Print_Values(queue, str);
+
+        return 1;
+    }
+
+    //Insert some values.
+    new     
+        values_[6] = {1024, 1048, 1072, 1096, 0, 455}, idx_ = 2;
+
+    for(new i = 0; i < (sizeof values_) - 1; ++i) 
+        Queue_InsertValue(queue, values_[i]);
+
+    //Remove some values.
+    for(new i = 0; i < 7; ++i)
+        Queue_RemoveFrontValue(queue);
+
+    //Insert the last value.
+    Queue_InsertValue(queue, values_[(sizeof values_) - 1]);
+
+    //Check if the values are the correct ones.
+    values_count = 0;
+
+    Queue_Foreach(new i : queue) {
+        if(values_[idx_++] == i)
+            values_count ++;
+    }
+
+    if(values_count != 4) {
+        new str[64] = "[Queue Tests] Foreach test 2 failed. Elements:";
+
+        _@Queue_Print_Values(queue, str);
+
+        return 1;
+    }
+
+    new str[64] = "[Queue Tests] Foreach test passed. Elements:";
+
     _@Queue_Print_Values(queue, str);
     return 1;
 } 
@@ -65,9 +103,8 @@ _@Queue_Test_Functions() {
 
     //Stopping the test if the queue values are not matching.
     if(values_count != 8) {
-        print("[Queue Tests] Insert test failed. (queue values are not matching) Elements:");
-
-        new str[64];
+        new str[128] = "[Queue Tests] Insert test failed. (queue values are not matching) Elements:";
+        
         _@Queue_Print_Values(queue, str);
 
         return 1;
@@ -138,10 +175,9 @@ _@Queue_Test_Functions() {
             values_count ++;
     }
 
-    if(values_count != 10) {
-        print("[Queue Tests] Remove test failed. (values count not matching). Elements:");
+    if(values_count != 10) {        
+        new str[128] = "[Queue Tests] Remove test failed. (values count not matching). Elements:";
         
-        new str[64];
         _@Queue_Print_Values(queue, str);
 
         return 1;
