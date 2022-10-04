@@ -35,11 +35,11 @@
 
 #define Queue_Foreach(new%0:%1) \
         Queue@count_%1[1] = 0; \
-        if(Queue@count_%1[0]) for(new Q_Foreach@idx = Queue@front_%1, %0 = Queue@%1[Q_Foreach@idx]; Queue@count_%1[1] < Queue@count_%1[0]; Q_Foreach@idx = (Q_Foreach@idx + 1) % Queue@size_%1, %0 = Queue@%1[Q_Foreach@idx], ++Queue@count_%1[1])
+        if(Queue@count_%1[0]) for(new Q_Foreach@idx = Queue@front_%1, %0 = Queue@%1[Q_Foreach@idx]; Queue@count_%1[1]++ < Queue@count_%1[0]; Q_Foreach@idx = (Q_Foreach@idx + 1) % Queue@size_%1, %0 = Queue@%1[Q_Foreach@idx])
 
 #define Queue_ForeachEx(new%0,%2:%1) \
         Queue@count_%1[1] = 0; \
-        if(Queue@count_%1[0]) for(new %2 = Queue@front_%1, %0 = Queue@%1[%2]; Queue@count_%1[1] < Queue@count_%1[0]; %2 = (%2 + 1) % Queue@size_%1, %0 = Queue@%1[%2], ++Queue@count_%1[1])
+        if(Queue@count_%1[0]) for(new %2 = Queue@front_%1, %0 = Queue@%1[%2]; Queue@count_%1[1]++ < Queue@count_%1[0]; %2 = (%2 + 1) % Queue@size_%1, %0 = Queue@%1[%2])
 
 // ------------------------------------- //
 //              Functions                //
@@ -116,10 +116,12 @@ stock bool:_Queue_InsertValue(queue[], &front, &back, &count, size, value_index,
     if(count == size || value_index != INVALID_QUEUE_VALUE)
         return false;
 
-    if(front == INVALID_QUEUE_VALUE) 
-        front = 0;
+    if(front != INVALID_QUEUE_VALUE) 
+        back = (back + 1) % size;
 
-    back = (back + 1) % size;
+    else 
+        front = back = 0;
+    
     queue[back] = value;
 
     count ++;
@@ -260,16 +262,18 @@ stock _Queue_GetValuePos(size, front, back, value_index) {
 //          Internal Functions           //
 // ------------------------------------- //
 
-stock _Queue_GetValueIndex(const queue[], front, back, size, count, value) {
+stock _Queue_GetValueIndex(const queue[], idx, end, size, count, value) {
     if(!count)
         return INVALID_QUEUE_VALUE;
 
-    if(queue[back] == value)
-        return back;
+    if(queue[end] == value)
+        return end;
 
-    for(new i = front; i != back; i = (i + 1) % size) {
-        if(queue[i] == value)
-            return i;
+    while(idx != end) {
+        if(queue[idx] == value)
+            return idx;
+
+        idx = (idx + 1) % size;
     }
     return INVALID_QUEUE_VALUE;
 }
