@@ -24,29 +24,27 @@
 // ------------------------------------- //
 
 #define Queue:%0<%1> \
-        Queue@%0[%1], Queue@front_%0 = INVALID_QUEUE_VALUE, Queue@back_%0 = INVALID_QUEUE_VALUE, Queue@count_%0[2], Queue@size_%0 = %1
+        Queue@%0[%1], Queue@front_%0 = INVALID_QUEUE_VALUE, Queue@back_%0 = INVALID_QUEUE_VALUE, Queue@count_%0, Queue@size_%0 = %1
 
 #define QueueArray:%0[%1]<%2> /*1d array support*/ \
-        Queue@%0[%1][%2], Queue@front_%0[%1] = {INVALID_QUEUE_VALUE, ...}, Queue@back_%0[%1] = {INVALID_QUEUE_VALUE, ...}, Queue@count_%0[%1][2], Queue@size_%0[%1] = {%2, ...}
+        Queue@%0[%1][%2], Queue@front_%0[%1] = {INVALID_QUEUE_VALUE, ...}, Queue@back_%0[%1] = {INVALID_QUEUE_VALUE, ...}, Queue@count_%0[%1], Queue@size_%0[%1] = {%2, ...}
 
 // ------------------------------------- //
 //        Foreach Implementation         //
 // ------------------------------------- //
 
 #define Queue_Foreach(new%0:%1) \
-        Queue@count_%1[1] = 0; \
-        if(Queue@count_%1[0]) for(new Q_Foreach@idx = Queue@front_%1, %0 = Queue@%1[Q_Foreach@idx]; Queue@count_%1[1]++ < Queue@count_%1[0]; Q_Foreach@idx = (Q_Foreach@idx + 1) % Queue@size_%1, %0 = Queue@%1[Q_Foreach@idx])
+        if(Queue@count_%1) for(new Q_Foreach@count, Q_Foreach@idx = Queue@front_%1, %0 = Queue@%1[Q_Foreach@idx]; Q_Foreach@count++ < Queue@count_%1; Q_Foreach@idx = (Q_Foreach@idx + 1) % Queue@size_%1, %0 = Queue@%1[Q_Foreach@idx])
 
 #define Queue_ForeachEx(new%0,%2:%1) \
-        Queue@count_%1[1] = 0; \
-        if(Queue@count_%1[0]) for(new %2 = Queue@front_%1, %0 = Queue@%1[%2]; Queue@count_%1[1]++ < Queue@count_%1[0]; %2 = (%2 + 1) % Queue@size_%1, %0 = Queue@%1[%2])
+        if(Queue@count_%1) for(new Q_Foreach@count, %2 = Queue@front_%1, %0 = Queue@%1[%2]; Q_Foreach@count++ < Queue@count_%1; %2 = (%2 + 1) % Queue@size_%1, %0 = Queue@%1[%2])
 
 // ------------------------------------- //
 //              Functions                //
 // ------------------------------------- //
 
 #define Queue_IsFull(%0) \
-        (Queue@count_%0[0] == Queue@size_%0)
+        (Queue@count_%0 == Queue@size_%0)
 
 /* ---------------------------------------------------------------- */
 /*  Queue_IsFull(queue)                                             */
@@ -58,7 +56,7 @@
 /* ---------------------------------------------------------------- */
 
 #define Queue_IsEmpty(%0) \
-        (!Queue@count_%0[0])
+        (!Queue@count_%0)
 
 /* ---------------------------------------------------------------- */
 /*  Queue_IsEmpty(queue)                                            */
@@ -70,7 +68,7 @@
 /* ---------------------------------------------------------------- */
 
 #define Queue_Count(%0) \
-        Queue@count_%0[0]
+        Queue@count_%0
 
 /* ---------------------------------------------------------------- */
 /*  Queue_Count(queue)                                              */
@@ -110,7 +108,7 @@ stock _Queue_GetFrontValue(const queue[], front)
 /* ---------------------------------------------------------------- */
 
 #define Queue_InsertValue(%0,%1) \
-        _Queue_InsertValue(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], Queue@size_%0, _Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0[0], %1), %1)
+        _Queue_InsertValue(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@count_%0, Queue@size_%0, _Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0, %1), %1)
 
 stock bool:_Queue_InsertValue(queue[], &front, &back, &count, size, value_index, value) {
     if(count == size || value_index != INVALID_QUEUE_VALUE)
@@ -138,7 +136,7 @@ stock bool:_Queue_InsertValue(queue[], &front, &back, &count, size, value_index,
 /* ---------------------------------------------------------------- */
 
 #define Queue_RemoveValue(%0,%1) \
-        _Queue_RemoveValue(Queue@%0, Queue@size_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], _Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0[0], %1)) 
+        _Queue_RemoveValue(Queue@%0, Queue@size_%0, Queue@front_%0, Queue@back_%0, Queue@count_%0, _Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0, %1)) 
 
 stock bool:_Queue_RemoveValue(queue[], size, &front, &back, &count, value_index) {
     if(value_index == INVALID_QUEUE_VALUE) 
@@ -175,7 +173,7 @@ stock bool:_Queue_RemoveValue(queue[], size, &front, &back, &count, value_index)
 /* ---------------------------------------------------------------- */
 
 #define Queue_RemoveFrontValue(%0) \
-        _Queue_RemoveFrontValue(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@count_%0[0], Queue@size_%0)
+        _Queue_RemoveFrontValue(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@count_%0, Queue@size_%0)
 
 stock _Queue_RemoveFrontValue(const queue[], &front, &back, &count, size) {
     if(!count) 
@@ -205,7 +203,7 @@ stock _Queue_RemoveFrontValue(const queue[], &front, &back, &count, size) {
 /* ---------------------------------------------------------------- */
 
 #define Queue_Clear(%0) \
-        _Queue_Clear(Queue@count_%0[0], Queue@front_%0, Queue@back_%0)
+        _Queue_Clear(Queue@count_%0, Queue@front_%0, Queue@back_%0)
 
 stock _Queue_Clear(&count, &front, &back)  {
     if(count) { 
@@ -224,7 +222,7 @@ stock _Queue_Clear(&count, &front, &back)  {
 /* ---------------------------------------------------------------- */
 
 #define Queue_GetValuePos(%0,%1) \
-        _Queue_GetValuePos(Queue@size_%0, Queue@front_%0, Queue@back_%0, _Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0[0], %1))
+        _Queue_GetValuePos(Queue@size_%0, Queue@front_%0, Queue@back_%0, _Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0, %1))
 
 stock _Queue_GetValuePos(size, front, back, value_index) {
     if(value_index == INVALID_QUEUE_VALUE)
@@ -247,7 +245,7 @@ stock _Queue_GetValuePos(size, front, back, value_index) {
 /* ---------------------------------------------------------------- */
 
 #define Queue_Contains(%0,%1) \
-        (_Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0[0], %1) != INVALID_QUEUE_VALUE)
+        (_Queue_GetValueIndex(Queue@%0, Queue@front_%0, Queue@back_%0, Queue@size_%0, Queue@count_%0, %1) != INVALID_QUEUE_VALUE)
 
 /* ---------------------------------------------------------------- */
 /*  Queue_Contains(queue, value)                                    */
